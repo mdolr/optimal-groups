@@ -23,7 +23,7 @@ class Graph:
         kwargs['graph'] = self
 
         # systeme d'identifiant automatique
-        if kwargs.get('id', True):
+        if not(kwargs.get('id', False)):
             kwargs['id'] = str(self.next_id)
             self.next_id += 1
 
@@ -49,7 +49,7 @@ class Graph:
         """
         kwargs['graph'] = self
 
-        if kwargs.get('id', True):
+        if not(kwargs.get('id', False)):
             kwargs['id'] = str(self.next_id)
             self.next_id += 1
 
@@ -57,6 +57,8 @@ class Graph:
 
         self.edges.append(edge)
         parent_node.edges.append(edge)
+
+        return edge
 
     def get_node_by_id(self, node_id):
         """
