@@ -7,6 +7,6 @@ class Node:
         self.id = kwargs.pop('id', None)
         self.name = kwargs.pop('name', None)
 
-        self.position = kwargs.pop('position', None)
+        self.graph = kwargs.pop('graph', None)
 
-        self.children = kwargs.pop('children', [])
+        self.edges = kwargs.pop('edges', [])
