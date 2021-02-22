@@ -45,7 +45,8 @@ if __name__ == '__main__':
     # on remplace les valeurs par defauts pour les arguments precises
     DEFAULT_OPTIONS.update(options)
 
-    load_data()
+    f = load_data('choix.csv')
+    load_groups(f)
     # lancer la recuperation des donnees
     # creer le graph
     # une fois le graph creer traiter le graph avec l'algo
