@@ -1,6 +1,9 @@
 import sys
 import getopt
-from src.common.data import load_data
+
+from src.structures.graph import Graph
+from src.structures.node import Node
+from src.structures.edge import Edge
 
 # Options par defaut
 DEFAULT_OPTIONS = {
@@ -44,8 +47,16 @@ if __name__ == '__main__':
 
     # on remplace les valeurs par defauts pour les arguments precises
     DEFAULT_OPTIONS.update(options)
+    """
+    graph = Graph()
+    graph.add_node(starting_node=True)
 
-    load_data()
+    for i in range(0, 5):
+        node = graph.add_node()
+        graph.add_edge(graph.starting_node, node)
+
+    print([edge.graph.next_id for edge in graph.starting_node.edges])
+    """
     # lancer la recuperation des donnees
     # creer le graph
     # une fois le graph creer traiter le graph avec l'algo
