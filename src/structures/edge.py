@@ -10,8 +10,8 @@ class Edge:
 
         self.weigh = kwargs.pop('weigh', 0)
 
-        #self.current_capacity = kwargs.pop('current_capacity', 0)
-        #self.limit_capacity = kwargs.pop('limit_capacity', 0)
+        self.current_capacity = kwargs.pop('current_capacity', 0)
+        self.limit_capacity = kwargs.pop('limit_capacity', 0)
 
         self.parent_node = kwargs.pop('parent_node', None)
         self.child_node = kwargs.pop('child_node', None)

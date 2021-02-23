@@ -10,6 +10,6 @@ class Node:
         self.graph = kwargs.pop('graph', None)
 
         self.edges = kwargs.pop('edges', [])
-        
-        self.current_capacity = kwargs.pop('current_capacity', 0)
-        self.limit_capacity = kwargs.pop('limit_capacity', 0)
+
+        #self.current_capacity = kwargs.pop('current_capacity', 0)
+        #self.limit_capacity = kwargs.pop('limit_capacity', 0)
