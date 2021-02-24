@@ -71,7 +71,7 @@ class Graph:
         """
         Renvoi une node par rapport a son id
         """
-        return [node for node in self.nodes if node.id == node_id][0]
+        return [node for node in self.nodes if node.id == node_id][0] if len([node for node in self.nodes if node.id == node_id]) > 0 else None
 
     def set_starting_node(self, node):
         """
