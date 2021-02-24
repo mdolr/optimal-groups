@@ -33,13 +33,14 @@ def create_graph(group_path, project_path):
     capacity = {}
 
     for row in project_rows:
-        node = graph.add_node(id=row[0])  # , limit_capacity=row[1])
+        node = graph.add_node(id=row[0], limit_capacity=int(row[1]))
 
         graph.add_edge(parent_node=node,
-                       child_node=graph.ending_node, limit_capacity=1)
+                       child_node=graph.ending_node,
+                       limit_capacity=1)
 
         # on stocke la capacite pour plus tard
-        capacity[row[0]] = row[1]
+        capacity[row[0]] = int(row[1])
 
         project_count += 1
 
@@ -61,12 +62,10 @@ def create_graph(group_path, project_path):
         graph.add_edge(parent_node=graph.starting_node,
                        child_node=node, limit_capacity=1)
 
-        weigh = len(row)
-
-        for i in range(1, weigh):
+        for i in range(1, len(row)):
             graph.add_edge(parent_node=node,
                            child_node=graph.get_node_by_id(row[i]),
-                           weigh=weigh - 1,
+                           weigh=len(row) - i,
                            limit_capacity=capacity.get(row[i], 0))
 
     """
