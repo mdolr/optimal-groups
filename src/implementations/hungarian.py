@@ -28,13 +28,13 @@ class Hungarian:
 
         equality_graph = graph.get_equality_graph(graph)
 
-        for i in range(0, 5):
-            # On veut trouver un chemin
-            print(i)
+        for i in range(0, len(equality_graph.starting_node.outgoing_edges)):
             for edge in equality_graph.starting_node.outgoing_edges[i].child_node.outgoing_edges:
-                print(edge.child_node.id)
-                if not(edge.child_node.is_saturated()):
-                    print('ALLO')
+
+                # On commence par verifier que le projet n'existe pas deja dans le matching
+                # ou que s'il existe il n'est pas deja sature
+                if not(self.matching.get_node_by_id(edge.child_node.id)) or not(self.matching.get_node_by_id(edge.child_node.id).is_saturated()):
+
                     # On ajoute le groupe
                     group_node = self.matching.add_node(
                         id=equality_graph.starting_node.outgoing_edges[i].child_node.id,
@@ -48,11 +48,11 @@ class Hungarian:
 
                     # Puis le projet
                     project_node = self.matching.add_node(
-                        id=edge.parent_node.id,
-                        name=edge.parent_node.name,
-                        label=edge.parent_node.label,
-                        limit_capacity=edge.parent_node.limit_capacity,
-                        current_capacity=edge.parent_node.current_capacity
+                        id=edge.child_node.id,
+                        name=edge.child_node.name,
+                        label=edge.child_node.label,
+                        limit_capacity=edge.child_node.limit_capacity,
+                        current_capacity=edge.child_node.current_capacity
                     )
 
                     edge = self.matching.add_edge(parent_node=group_node,
@@ -61,6 +61,8 @@ class Hungarian:
 
                     print(
                         f'{edge.parent_node.id} to {edge.child_node.id} Weigh: {edge.weigh}')
+                else:
+                    print('Aie aie les problemes')
 
         return self.matching
 
