@@ -1,9 +1,7 @@
 import sys
 import getopt
 from src.common.data import create_graph
-from src.structures.graph import Graph
-from src.structures.node import Node
-from src.structures.edge import Edge
+from src.implementations.hungarian import Hungarian
 
 # Options par defaut
 DEFAULT_OPTIONS = {
@@ -48,7 +46,12 @@ if __name__ == '__main__':
     # on remplace les valeurs par defauts pour les arguments precises
     DEFAULT_OPTIONS.update(options)
 
-    create_graph('choix.csv', 'project.csv')
+    graph = create_graph('choix.csv', 'project.csv')
+
+    algorithm = Hungarian()
+    matching_graph = algorithm.solve(graph)
+
+    matching_graph.draw(bipartite=False)
 
     """
     graph = Graph()
