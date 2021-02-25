@@ -13,58 +13,89 @@ class Hungarian:
     """
 
     def __init__(self, **kwargs):
+        self.graph = kwargs.pop('graph', Graph())
+
         self.matching = Graph()
+
+        self.matched_projects = []
+
+        self.init_matching()
+
+    def init_matching(self):
         self.matching.add_node(starting_node=True, id='start')
         self.matching.add_node(ending_node=True, id='end')
 
-    def solve(self, graph):
+    def solve(self):
         """
         Une fonction qui applique tout l'algorithme en appelant
         des fonctions complementaires
 
         Elle renvoit les resultats
         """
-        self.initalize_labels(graph)
+        self.initalize_labels(self.graph)
 
-        equality_graph = graph.get_equality_graph(graph)
+        equality_graph = self.graph.get_equality_graph()
 
-        for i in range(0, len(equality_graph.starting_node.outgoing_edges)):
-            for edge in equality_graph.starting_node.outgoing_edges[i].child_node.outgoing_edges:
+        # for edge in equality_graph.starting_node.outgoing_edges:
+        # self.find_augmenting_path(
+        #    self.graph.get_equality_graph(), edge.child_node.id)
 
-                # On commence par verifier que le projet n'existe pas deja dans le matching
-                # ou que s'il existe il n'est pas deja sature
-                if not(self.matching.get_node_by_id(edge.child_node.id)) or not(self.matching.get_node_by_id(edge.child_node.id).is_saturated()):
-
-                    # On ajoute le groupe
-                    group_node = self.matching.add_node(
-                        id=equality_graph.starting_node.outgoing_edges[i].child_node.id,
-                        name=equality_graph.starting_node.outgoing_edges[i].child_node.name,
-                        label=equality_graph.starting_node.outgoing_edges[i].child_node.label,
-                        limit_capacity=equality_graph.starting_node.outgoing_edges[
-                            i].child_node.limit_capacity,
-                        current_capacity=equality_graph.starting_node.outgoing_edges[
-                            i].child_node.current_capacity
-                    )
-
-                    # Puis le projet
-                    project_node = self.matching.add_node(
-                        id=edge.child_node.id,
-                        name=edge.child_node.name,
-                        label=edge.child_node.label,
-                        limit_capacity=edge.child_node.limit_capacity,
-                        current_capacity=edge.child_node.current_capacity
-                    )
-
-                    edge = self.matching.add_edge(parent_node=group_node,
-                                                  child_node=project_node,
-                                                  weigh=edge.weigh)
-
-                    print(
-                        f'{edge.parent_node.id} to {edge.child_node.id} Weigh: {edge.weigh}')
-                else:
-                    print('Aie aie les problemes')
+        # 1. on fait un graph d'egalite
+        # 2. on cherche le chemin alternatif le plus court
+        # on considere un chemin comme alternatif si son point
+        # d'arrivee se trouve dans les projets, son point de depart est un groupe
+        # et le projet d'arrivee n'est pas sature
+        # Si le projet est sature alors on update les poids avec delta
+        # puis on continu la recherche d'un chemin alternatif
+        # une fois trouve on cherche la version du chemin alternatif la plus courte
+        # et on fait les echanges necessaires
 
         return self.matching
+
+    def find_augmenting_path(self, equality_graph, starting_node_id):
+        """
+        Trouve un chemin tel que le point de depart est un groupe
+        le point d'arrive est un projet non sature 
+        (c'est a dire un projet recevant moins de connexion que sa capacite)
+        Le chemin alterne entre groupe et projet
+        """
+
+        def find_path(last_node, S, T):
+            # Pour les groupes
+            if 'Groupe' in last_node.id:
+                # On explore les noeuds enfants
+                for edge in last_node.outgoing_edges:
+                    # A la recherche d'un noeud pas visite
+                    if not edge.child_node.id in T:
+                        # si le noeud n'est pas sature on s'arrete
+                        if not edge.child_node.is_saturated():
+                            print(
+                                f'{edge.parent_node.id} to {edge.child_node.id} W: {edge.weigh}')
+                            last_node = equality_graph.get_node_by_id(
+                                edge.child_node.id)
+                            T.append(last_node.id)
+                            return f'{edge.parent_node.id} to {edge.child_node.id} W: {edge.weigh}'
+
+                # si on en trouve aucune pas sature
+                # sinon on retravaille les poids des noeuds
+                # et on refait un nouveau graph d'egalite
+                if len([edge for edge in last_node.outgoing_edges if not edge.child_node.is_saturated()]) == 0:
+                    self.delta_update_labels(T, S)
+                    equality_graph = self.graph.get_equality_graph()
+                    return find_path(last_node=last_node, S=S, T=T)
+
+            # Pour les projets
+            elif 'Projet' in last_node.id:
+                # On explore les noeuds parents
+                for edge in last_node.incoming_edges:
+                    # A la recherche d'un noeud pas visite
+                    if not edge.parent_node.id in S:
+                        last_node = equality_graph.get_node_by_id(
+                            edge.parent_node.id)
+                        S.append(last_node.id)
+                        return find_path(last_node=last_node, S=S, T=T)
+
+        return find_path(last_node=equality_graph.get_node_by_id(starting_node_id), S=[starting_node_id], T=[])
 
     def initalize_labels(self, graph):
         """
@@ -73,7 +104,45 @@ class Hungarian:
         for edge in graph.starting_node.outgoing_edges:
             # Recherche de la connexion avec le poids le plus haut
             highest_weigh = max(
-                [edge.weigh for edge in edge.child_node.outgoing_edges])
+                [int(edge.weigh) for edge in edge.child_node.outgoing_edges])
 
             # on met a jour la valeur du noeud comme le plus haut poids
-            edge.child_node.update_label(highest_weigh)
+            edge.child_node.label = int(highest_weigh)
+
+    def delta_update_labels(self, T, S):
+        """
+        Mise a jour des valeurs de chaque noeud avec calcul
+        du delta minimum
+        """
+        delta = None
+
+        # On veut calculer le delta minimum
+        for node_id in S:
+
+            # Pour chaque noeud dans S
+            S_node = self.graph.get_node_by_id(node_id)
+            for edge in S_node.outgoing_edges:
+
+                # on veut calculer le delta de chaque connexion vers
+                # un noeud pas inclus dans T
+                if not(edge.child_node.id in T):
+
+                    # on recherche le delta minimum
+                    if not delta or (int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weigh)) < delta:
+                        delta = (int(edge.parent_node.label) +
+                                 int(edge.child_node.label) -
+                                 int(edge.weigh))
+
+        # Une fois delta trouve on veut update les valeur de chaque noeud
+        if delta:
+            # Les noeuds de la categorie S (les groupes)
+            # se font enlever delta
+            for node_id in S:
+                node = self.graph.get_node_by_id(node_id)
+                node.label -= delta
+
+            # Les noeuds de la categorie T (les projets)
+            # se font ajouter delta
+            for node_id in T:
+                node = self.graph.get_node_by_id(node_id)
+                node.label += delta
