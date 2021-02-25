@@ -48,10 +48,8 @@ if __name__ == '__main__':
 
     graph = create_graph('choix.csv', 'project.csv')
 
-    algorithm = Hungarian()
-    matching_graph = algorithm.solve(graph)
-
-    matching_graph.draw(bipartite=False)
+    algorithm = Hungarian(graph=graph)
+    matching_graph = algorithm.solve()
 
     """
     graph = Graph()
@@ -61,7 +59,7 @@ if __name__ == '__main__':
         node = graph.add_node()
         graph.add_edge(graph.starting_node, node)
 
-    
+
     print([edge.graph.next_id for edge in graph.starting_node.edges])
     """
     # lancer la recuperation des donnees

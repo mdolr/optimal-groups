@@ -65,7 +65,7 @@ def create_graph(group_path, project_path):
         for i in range(1, len(row)):
             graph.add_edge(parent_node=node,
                            child_node=graph.get_node_by_id(row[i]),
-                           weigh=len(row) - i,
+                           weigh=int(len(row) - i),
                            limit_capacity=capacity.get(row[i], 0))
 
     """

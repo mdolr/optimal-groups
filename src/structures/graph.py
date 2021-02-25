@@ -114,12 +114,13 @@ class Graph:
             nx.draw(g, with_labels=True)
             plt.show()
 
-    def get_equality_graph(self, graph):
+    def get_equality_graph(self):
         """
         Retourne le graph egalitaire, c'est a dire un graph dans lequel
         la somme des valeurs des noeuds de depart et d'arrivee d'une connexion
         est egale au poids de la connexion
         """
+
         # On construit un objet graph
         equality_graph = Graph()
         equality_graph.add_node(starting_node=True, id='start')
@@ -127,7 +128,7 @@ class Graph:
 
         # On ajoute chaque projet en parent du noeud
         # d'arrivee
-        for edge in graph.ending_node.incoming_edges:
+        for edge in self.ending_node.incoming_edges:
             node = equality_graph.add_node(
                 id=edge.parent_node.id,
                 name=edge.parent_node.name,
@@ -141,7 +142,7 @@ class Graph:
 
         # De meme pour chaque noeud enfant du
         # point de depart
-        for edge in graph.starting_node.outgoing_edges:
+        for edge in self.starting_node.outgoing_edges:
             node = equality_graph.add_node(
                 id=edge.child_node.id,
                 name=edge.child_node.name,

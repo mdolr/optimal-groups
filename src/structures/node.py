@@ -17,12 +17,6 @@ class Node:
         self.current_capacity = kwargs.pop('current_capacity', 0)
         self.limit_capacity = kwargs.pop('limit_capacity', 0)
 
-    def update_label(self, value):
-        """
-        Met a jour la valeur du noeud
-        """
-        self.label = value
-
     def is_saturated(self):
         """
         Retourne un booleen derivant si le noeud est sature
