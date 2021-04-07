@@ -46,7 +46,8 @@ if __name__ == '__main__':
     # on remplace les valeurs par defauts pour les arguments precises
     DEFAULT_OPTIONS.update(options)
 
-    graph = create_graph('choix.csv', 'project.csv')
+    #graph = create_graph('choix.csv', 'project.csv')
+    graph = create_graph('m9_groupes.csv', 'm9_projects.csv')
 
     algorithm = Hungarian(graph=graph)
     matching_graph = algorithm.solve()

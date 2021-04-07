@@ -47,6 +47,15 @@ class Graph:
         """
         Supprime une node et ses edges du reseau
         """
+        for edge in node.outgoing_edges:
+            self.remove_edge(node, edge.child_node)
+
+        for edge in node.incoming_edges:
+            self.remove_edge(edge.parent_node, node)
+
+        self.nodes.pop(node)
+
+        return True
 
     def add_edge(self, parent_node, child_node, **kwargs):
         """

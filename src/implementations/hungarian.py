@@ -57,13 +57,15 @@ class Hungarian:
         Le chemin alterne entre groupe et projet
         """
 
-        print('APPELE 1 FOIS')
+        print(
+            f'Finding a full augmenting path, starting_node={starting_node_id}')
 
         def find_path(last_node, equality_graph, S, T):
             """
             ...
             """
             print(f'Finding path from {last_node.id}\n- S={S}\n- T={T}')
+            self.matching.draw(bipartite=False)
 
             # On a un groupe
             # On veut trouver un augmenting path (i.e un chemin qui zig zag)
@@ -94,8 +96,9 @@ class Hungarian:
                             edge.parent_node.id)
 
                         if not matching_child or not matching_child.is_saturated():
+                            # Si c'est le lien final
                             print(
-                                f'Link found {edge.parent_node.id} to {edge.child_node.id} W: {edge.weigh}')
+                                f'Final link found {edge.parent_node.id} to {edge.child_node.id} W: {edge.weigh}')
 
                             # On a trouve une destination non saturee
                             # dans le cote des projets c'est a dire un augmenting path
@@ -154,10 +157,11 @@ class Hungarian:
 
                     # On utilise le premier enfant du projet
                     if len(matching_parent.incoming_edges) > 0:
-                        S.append(matching_parent.incoming_edges[0].id)
+                        S.append(
+                            matching_parent.incoming_edges[0].parent_node.id)
 
                         new_last_node = equality_graph.get_node_by_id(
-                            matching_parent.incoming_edges[0].id)
+                            matching_parent.incoming_edges[0].parent_node.id)
 
                 return find_path(last_node=new_last_node, equality_graph=equality_graph, S=S, T=T)
 
@@ -220,6 +224,7 @@ class Hungarian:
         Mise a jour des valeurs de chaque noeud avec calcul
         du delta minimum
         """
+        print(f'Updating labels using the following\n- S={S}\n- T={T}')
         delta = None
 
         # On veut calculer le delta minimum
