@@ -50,6 +50,7 @@ if __name__ == '__main__':
 
     algorithm = Hungarian(graph=graph)
     matching_graph = algorithm.solve()
+    matching_graph.draw(bipartite=False)
 
     """
     graph = Graph()

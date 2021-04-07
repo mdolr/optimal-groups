@@ -5,9 +5,9 @@ class Hungarian:
     """
     Algorithme hongrois avec poids
 
-    Sources: 
+    Sources:
     - https://www-m9.ma.tum.de/graph-algorithms/matchings-hungarian-method/index_en.html
-    - https://yasenh.github.io/post/hungarian-algorithm-2/
+    - https:/yasenh.github.io/post/hungarian-algorithm-2/
 
     Prend en parametre un graph biparti
     """
@@ -49,18 +49,21 @@ class Hungarian:
 
         return self.matching
 
-    def find_augmenting_path(self, equality_graph, starting_node_id):
+    def find_augmenting_path(self, base_equality_graph, starting_node_id):
         """
         Trouve un chemin tel que le point de depart est un groupe
-        le point d'arrive est un projet non sature 
+        le point d'arrive est un projet non sature
         (c'est a dire un projet recevant moins de connexion que sa capacite)
         Le chemin alterne entre groupe et projet
         """
 
-        def find_path(last_node, S, T):
+        print('APPELE 1 FOIS')
+
+        def find_path(last_node, equality_graph, S, T):
             """
             ...
             """
+            print(f'Finding path from {last_node.id}\n- S={S}\n- T={T}')
 
             # On a un groupe
             # On veut trouver un augmenting path (i.e un chemin qui zig zag)
@@ -81,10 +84,16 @@ class Hungarian:
                         # On va iterer la boucle entierement mais on garde en memoire
                         # les projets satures que l'on a pas visite
 
-                        # TODO: Utiliser la node du graph de matching pour tester saturation
+                        # Utiliser la node du graph de matching pour tester saturation
                         # en checkant d'abord si la node existe
 
-                        if not edge.child_node.is_saturated():
+                        matching_child = self.matching.get_node_by_id(
+                            edge.child_node.id)
+
+                        matching_parent = self.matching.get_node_by_id(
+                            edge.parent_node.id)
+
+                        if not matching_child or not matching_child.is_saturated():
                             print(
                                 f'Link found {edge.parent_node.id} to {edge.child_node.id} W: {edge.weigh}')
 
@@ -92,16 +101,26 @@ class Hungarian:
                             # dans le cote des projets c'est a dire un augmenting path
                             # si on a trouve un tel path alors on a fini, on retourne met a jour le matching
 
-                            # TODO: Creer les nodes avant de les ajouter en checkant si nodes existent pas deja
-                            self.matching.add_node(
-                                id=edge.child_node.id,
-                                name=edge.child_node.name,
-                                label=edge.child_node.label,
-                                limit_capacity=edge.child_node.limit_capacity,
-                                current_capacity=edge.child_node.current_capacity)
+                            # Creer les nodes avant de les ajouter en checkant si nodes existent pas deja
+
+                            if not self.matching.get_node_by_id(edge.child_node.id):
+                                matching_child = self.matching.add_node(
+                                    id=edge.child_node.id,
+                                    name=edge.child_node.name,
+                                    label=edge.child_node.label,
+                                    limit_capacity=edge.child_node.limit_capacity,
+                                    current_capacity=edge.child_node.current_capacity)
+
+                            if not self.matching.get_node_by_id(edge.parent_node.id):
+                                matching_parent = self.matching.add_node(
+                                    id=edge.parent_node.id,
+                                    name=edge.parent_node.name,
+                                    label=edge.parent_node.label,
+                                    limit_capacity=edge.parent_node.limit_capacity,
+                                    current_capacity=edge.parent_node.current_capacity)
 
                             self.matching.add_edge(
-                                edge.parent_node, edge.child_node)
+                                matching_parent, matching_child)
 
                             return self.matching
 
@@ -116,17 +135,34 @@ class Hungarian:
                 # on veut alors update les labels en calculant delta pour
                 # se donner de nouvelles options
 
+                # On applique la mise a jour des labels de chaque noeud
+                # en utilisant le calcul de delta
+                self.delta_update_labels(S=S, T=T)
+                equality_graph = self.graph.get_equality_graph()
+
+                new_last_node = equality_graph.get_node_by_id(last_node.id)
+
+                # On remonte la connexion de notre projet sature dans le matching
                 if len(saturated_projects) > 0:
 
-                    # On applique la mise a jour des labels de chaque noeud
-                    # en utilisant le calcul de delta
-                    self.delta_update_labels(T, S)
-                    equality_graph = self.graph.get_equality_graph()
-                    return find_path(last_node=last_node, S=S, T=T)
+                    # On rajoute le noeud d'un projet dans T
+                    # choisi arbitrairement parmi les projets satures
+                    T.append(saturated_projects[0].id)
 
-                else:
-                    print(
-                        f'[Blocage] - Impossible de trouver un projet pour le groupe {last_node.id}')
+                    matching_parent = self.matching.get_node_by_id(
+                        saturated_projects[0].id)
+
+                    # On utilise le premier enfant du projet
+                    if len(matching_parent.incoming_edges) > 0:
+                        S.append(matching_parent.incoming_edges[0].id)
+
+                        new_last_node = equality_graph.get_node_by_id(
+                            matching_parent.incoming_edges[0].id)
+
+                return find_path(last_node=new_last_node, equality_graph=equality_graph, S=S, T=T)
+
+            # elif 'Projet' in last_node.id:
+        return find_path(last_node=base_equality_graph.get_node_by_id(starting_node_id), equality_graph=base_equality_graph, S=[starting_node_id], T=[])
 
         """
         def find_path(last_node, S, T):
@@ -179,7 +215,7 @@ class Hungarian:
             # on met a jour la valeur du noeud comme le plus haut poids
             edge.child_node.label = int(highest_weigh)
 
-    def delta_update_labels(self, T, S):
+    def delta_update_labels(self, S, T):
         """
         Mise a jour des valeurs de chaque noeud avec calcul
         du delta minimum
