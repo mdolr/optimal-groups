@@ -14,11 +14,8 @@ class Hungarian:
 
     def __init__(self, **kwargs):
         self.graph = kwargs.pop('graph', Graph())
-
         self.matching = Graph()
-
         self.matched_projects = []
-
         self.init_matching()
 
     def init_matching(self):
@@ -36,9 +33,9 @@ class Hungarian:
 
         equality_graph = self.graph.get_equality_graph()
 
-        # for edge in equality_graph.starting_node.outgoing_edges:
-        # self.find_augmenting_path(
-        #    self.graph.get_equality_graph(), edge.child_node.id)
+        for edge in equality_graph.starting_node.outgoing_edges:
+            self.find_augmenting_path(
+                self.graph.get_equality_graph(), edge.child_node.id)
 
         # 1. on fait un graph d'egalite
         # 2. on cherche le chemin alternatif le plus court
@@ -61,6 +58,78 @@ class Hungarian:
         """
 
         def find_path(last_node, S, T):
+            """
+            ...
+            """
+
+            # On a un groupe
+            # On veut trouver un augmenting path (i.e un chemin qui zig zag)
+            # qui termine dans un projet non sature
+            if 'Groupe' in last_node.id:
+
+                saturated_projects = []
+
+                # On veut explorer toutes les connexions
+                # sortantes de ce groupe (donc vers des projet)
+                # pour acceder aux projets enfants
+                for edge in last_node.outgoing_edges:
+
+                    # On cherche un noeud pas visite et pas sature
+                    # si l'on en trouve un
+                    if not edge.child_node.id in T:
+
+                        # On va iterer la boucle entierement mais on garde en memoire
+                        # les projets satures que l'on a pas visite
+
+                        # TODO: Utiliser la node du graph de matching pour tester saturation
+                        # en checkant d'abord si la node existe
+
+                        if not edge.child_node.is_saturated():
+                            print(
+                                f'Link found {edge.parent_node.id} to {edge.child_node.id} W: {edge.weigh}')
+
+                            # On a trouve une destination non saturee
+                            # dans le cote des projets c'est a dire un augmenting path
+                            # si on a trouve un tel path alors on a fini, on retourne met a jour le matching
+
+                            # TODO: Creer les nodes avant de les ajouter en checkant si nodes existent pas deja
+                            self.matching.add_node(
+                                id=edge.child_node.id,
+                                name=edge.child_node.name,
+                                label=edge.child_node.label,
+                                limit_capacity=edge.child_node.limit_capacity,
+                                current_capacity=edge.child_node.current_capacity)
+
+                            self.matching.add_edge(
+                                edge.parent_node, edge.child_node)
+
+                            return self.matching
+
+                        else:
+                            saturated_projects.append(edge.child_node)
+
+                # Si on en arrive la, cela veut dire que l'on a pas
+                # obtenu de destination satisfaisante pour terminer notre
+                # augmenting path.
+
+                # S'il existe un projet sature mais non visite (pas dans T)
+                # on veut alors update les labels en calculant delta pour
+                # se donner de nouvelles options
+
+                if len(saturated_projects) > 0:
+
+                    # On applique la mise a jour des labels de chaque noeud
+                    # en utilisant le calcul de delta
+                    self.delta_update_labels(T, S)
+                    equality_graph = self.graph.get_equality_graph()
+                    return find_path(last_node=last_node, S=S, T=T)
+
+                else:
+                    print(
+                        f'[Blocage] - Impossible de trouver un projet pour le groupe {last_node.id}')
+
+        """
+        def find_path(last_node, S, T):
             # Pour les groupes
             if 'Groupe' in last_node.id:
                 # On explore les noeuds enfants
@@ -74,7 +143,7 @@ class Hungarian:
                             last_node = equality_graph.get_node_by_id(
                                 edge.child_node.id)
                             T.append(last_node.id)
-                            return f'{edge.parent_node.id} to {edge.child_node.id} W: {edge.weigh}'
+                            # return f'{edge.parent_node.id} to {edge.child_node.id} W: {edge.weigh}'
 
                 # si on en trouve aucune pas sature
                 # sinon on retravaille les poids des noeuds
@@ -96,6 +165,7 @@ class Hungarian:
                         return find_path(last_node=last_node, S=S, T=T)
 
         return find_path(last_node=equality_graph.get_node_by_id(starting_node_id), S=[starting_node_id], T=[])
+        """
 
     def initalize_labels(self, graph):
         """
