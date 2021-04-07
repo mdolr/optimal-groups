@@ -67,6 +67,25 @@ class Graph:
 
         return edge
 
+    def remove_edge(self, parent_node, child_node):
+        """
+        Supprime une connexion entre 2 nodes
+        Renvoi True si succes
+        False sinon
+        """
+
+        delete_edge = [edge for edge in parent_node.outgoing_edges if (
+            edge.parent_node.id == parent_node.id and edge.child_node.id == child_node.id)][0] if len([edge for edge in parent_node.outgoing_edges if edge.parent_node.id == parent_node.id and edge.child_node.id == child_node.id]) > 0 else None
+
+        if delete_edge:
+            parent_node.outgoing_edges.pop(delete_edge[0])
+            child_node.incoming_edges.pop(delete_edge[0])
+            self.edges.pop(delete_edge[0])
+            return True
+
+        else:
+            return False
+
     def get_node_by_id(self, node_id):
         """
         Renvoi une node par rapport a son id
