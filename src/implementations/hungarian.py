@@ -60,12 +60,11 @@ class Hungarian:
         print(
             f'Finding a full augmenting path, starting_node={starting_node_id}')
 
-        def find_path(last_node, equality_graph, S, T):
+        def find_path(last_node, equality_graph, S, T, rewrite_matching=False):
             """
             ...
             """
             print(f'Finding path from {last_node.id}\n- S={S}\n- T={T}')
-            self.matching.draw(bipartite=False)
 
             # On a un groupe
             # On veut trouver un augmenting path (i.e un chemin qui zig zag)
@@ -105,25 +104,9 @@ class Hungarian:
                             # si on a trouve un tel path alors on a fini, on retourne met a jour le matching
 
                             # Creer les nodes avant de les ajouter en checkant si nodes existent pas deja
-
-                            if not self.matching.get_node_by_id(edge.child_node.id):
-                                matching_child = self.matching.add_node(
-                                    id=edge.child_node.id,
-                                    name=edge.child_node.name,
-                                    label=edge.child_node.label,
-                                    limit_capacity=edge.child_node.limit_capacity,
-                                    current_capacity=edge.child_node.current_capacity)
-
-                            if not self.matching.get_node_by_id(edge.parent_node.id):
-                                matching_parent = self.matching.add_node(
-                                    id=edge.parent_node.id,
-                                    name=edge.parent_node.name,
-                                    label=edge.parent_node.label,
-                                    limit_capacity=edge.parent_node.limit_capacity,
-                                    current_capacity=edge.parent_node.current_capacity)
-
-                            self.matching.add_edge(
-                                matching_parent, matching_child)
+                            if rewrite_matching:
+                                T.append(edge.child_node.id)
+                                self.update_matching(S=S, T=T)
 
                             return self.matching
 
@@ -166,7 +149,15 @@ class Hungarian:
                 return find_path(last_node=new_last_node, equality_graph=equality_graph, S=S, T=T)
 
             # elif 'Projet' in last_node.id:
-        return find_path(last_node=base_equality_graph.get_node_by_id(starting_node_id), equality_graph=base_equality_graph, S=[starting_node_id], T=[])
+
+        # On fait tourner une premiere fois la fonction pour trouver un augmenting path
+        find_path(last_node=base_equality_graph.get_node_by_id(starting_node_id),
+                  equality_graph=base_equality_graph, S=[starting_node_id], T=[], rewrite_matching=False)
+
+        print('------- SHORTEST PATH -------')
+
+        # Puis une 2nde fois en lui demandant de reecrire le matching avec le chemin le plus court cette fois ci
+        return find_path(last_node=self.graph.get_equality_graph().get_node_by_id(starting_node_id), equality_graph=self.graph.get_equality_graph(), S=[starting_node_id], T=[], rewrite_matching=True)
 
         """
         def find_path(last_node, S, T):
@@ -207,6 +198,83 @@ class Hungarian:
         return find_path(last_node=equality_graph.get_node_by_id(starting_node_id), S=[starting_node_id], T=[])
         """
 
+    def update_matching(self, S, T):
+        """
+        Met a jour le graph de matching
+        """
+
+        print(f'Update matching using\n- S={S}\n- T={T}')
+        # On commence par remettre a 0 les connexions si les noeuds
+        # existent deja dans le matching en les supprimant
+        # puis en les recreant
+        self.matching.draw(
+            bipartite=False, title='Graph avant update matching')
+
+        for node_id in S:
+            if self.matching.get_node_by_id(node_id):
+                self.matching.remove_node(
+                    self.matching.get_node_by_id(node_id))
+
+            node = self.graph.get_node_by_id(node_id)
+
+            self.matching.add_node(
+                id=node.id,
+                name=node.name,
+                label=node.label,
+                limit_capacity=node.limit_capacity,
+                current_capacity=node.current_capacity)
+
+        for node_id in T:
+            if self.matching.get_node_by_id(node_id):
+                self.matching.remove_node(
+                    self.matching.get_node_by_id(node_id))
+
+            node = self.graph.get_node_by_id(node_id)
+
+            self.matching.add_node(
+                id=node.id,
+                name=node.name,
+                label=node.label,
+                limit_capacity=node.limit_capacity,
+                current_capacity=node.current_capacity)
+
+        for i in range(0, len(S)):
+            self.matching.add_edge(self.matching.get_node_by_id(
+                S[i]), self.matching.get_node_by_id(T[i]))
+
+        self.matching.draw(
+            bipartite=False, title='Graph apres update matching')
+        return self.matching
+        """
+
+              if self.matching.get_node_by_id(edge.child_node.id):
+                  self.matching.remove_node(
+                      self.matching.get_node_by_id(edge.child_node.id))
+
+              matching_child = self.matching.add_node(
+                  id=edge.child_node.id,
+                  name=edge.child_node.name,
+                  label=edge.child_node.label,
+                  limit_capacity=edge.child_node.limit_capacity,
+                  current_capacity=edge.child_node.current_capacity)
+
+              if self.matching.get_node_by_id(edge.parent_node.id):
+                  self.matching.remove_node(
+                      self.matching.get_node_by_id(edge.parent_node.id))
+
+              matching_parent = self.matching.add_node(
+                  id=edge.parent_node.id,
+                  name=edge.parent_node.name,
+                  label=edge.parent_node.label,
+                  limit_capacity=edge.parent_node.limit_capacity,
+                  current_capacity=edge.parent_node.current_capacity)
+
+              self.matching.add_edge(
+                  matching_parent, matching_child)
+
+              return 't'
+            """
+
     def initalize_labels(self, graph):
         """
         Initialise la valeur de chaque noeud projet
@@ -227,6 +295,9 @@ class Hungarian:
         print(f'Updating labels using the following\n- S={S}\n- T={T}')
         delta = None
 
+        self.graph.draw(
+            bipartite=False, title='Graph avant update labels')
+
         # On veut calculer le delta minimum
         for node_id in S:
 
@@ -237,15 +308,17 @@ class Hungarian:
                 # on veut calculer le delta de chaque connexion vers
                 # un noeud pas inclus dans T
                 if not(edge.child_node.id in T):
+                    print(f'Delta : {(int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weigh))} {edge.parent_node.label} ({edge.parent_node.id}) + {edge.child_node.label} ({edge.child_node.id}) - {edge.weigh}')
 
                     # on recherche le delta minimum
-                    if not delta or (int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weigh)) < delta:
+                    if delta is None or (int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weigh)) < delta:
                         delta = (int(edge.parent_node.label) +
                                  int(edge.child_node.label) -
                                  int(edge.weigh))
 
         # Une fois delta trouve on veut update les valeur de chaque noeud
-        if delta:
+        if delta is not None:
+            print(f'BLABLABLABLABLABLA JE SUIS DELTA {delta}')
             # Les noeuds de la categorie S (les groupes)
             # se font enlever delta
             for node_id in S:
@@ -257,3 +330,6 @@ class Hungarian:
             for node_id in T:
                 node = self.graph.get_node_by_id(node_id)
                 node.label += delta
+
+        self.graph.draw(
+            bipartite=False, title='Graph apres update labels')

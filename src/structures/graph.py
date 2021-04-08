@@ -113,7 +113,7 @@ class Graph:
         """
         self.ending_node = node
 
-    def draw(self, bipartite):
+    def draw(self, bipartite, **kwargs):
         """
         Permet de dessiner le graphique pour debugger
         avec plus de confort
@@ -137,9 +137,17 @@ class Graph:
             pos.update((n, (2, i))
                        for i, n in enumerate(Y))  # put nodes from Y at x=2
             nx.draw(g, pos=pos, with_labels=True)
+
+            if kwargs['title']:
+                plt.title(kwargs['title'])
+
             plt.show()
         else:
             nx.draw(g, with_labels=True)
+
+            if kwargs['title']:
+                plt.title(kwargs['title'])
+
             plt.show()
 
     def get_equality_graph(self):
