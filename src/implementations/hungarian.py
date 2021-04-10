@@ -239,8 +239,11 @@ class Hungarian:
                 current_capacity=node.current_capacity)
 
         for i in range(0, len(S)):
+            edge = self.graph.get_edge(self.graph.get_node_by_id(
+                S[i]), self.graph.get_node_by_id(T[i]))
+
             self.matching.add_edge(self.matching.get_node_by_id(
-                S[i]), self.matching.get_node_by_id(T[i]))
+                S[i]), self.matching.get_node_by_id(T[i]), weigh=edge.weigh)
 
         self.matching.draw(
             bipartite=False, title='Graph apres update matching')
