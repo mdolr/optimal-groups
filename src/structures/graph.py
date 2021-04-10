@@ -87,10 +87,12 @@ class Graph:
         False sinon
         """
 
-        if self.get_edge(parent_node, child_node):
-            parent_node.outgoing_edges.pop(delete_edge[0])
-            child_node.incoming_edges.pop(delete_edge[0])
-            self.edges.pop(delete_edge[0])
+        edge = self.get_edge(parent_node, child_node)
+
+        if edge:
+            parent_node.outgoing_edges.pop(edge[0])
+            child_node.incoming_edges.pop(edge[0])
+            self.edges.pop(edge[0])
             return True
 
         else:
