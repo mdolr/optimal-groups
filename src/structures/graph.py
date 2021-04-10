@@ -90,9 +90,9 @@ class Graph:
         edge = self.get_edge(parent_node, child_node)
 
         if edge:
-            parent_node.outgoing_edges.pop(edge[0])
-            child_node.incoming_edges.pop(edge[0])
-            self.edges.pop(edge[0])
+            parent_node.outgoing_edges.pop(edge)
+            child_node.incoming_edges.pop(edge)
+            self.edges.pop(edge)
             return True
 
         else:
