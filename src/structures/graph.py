@@ -120,17 +120,33 @@ class Graph:
         """
         Permet de dessiner le graphique pour debugger
         avec plus de confort
+
+        Credits:
+        affichage des couleurs d'edge: https://stackoverflow.com/a/25651827
+        affichage des labels d'edge: https://stackoverflow.com/a/28372251
         """
         g = nx.Graph()
+        title = kwargs.pop('title', 'Unnamed graph')
+        print(f'Title {title}')
 
         for node in self.nodes:
             if node.id != 'start' and node.id != 'end':
-                g.add_node(f'{node.id}:{node.label}')
+                # Trouver le numero du projet ou de la node
+                node_pos = node.id.replace('Groupe', '').replace('Projet', '')
+
+                g.add_node(f'{node.id}:{node.label}', pos=(
+                    int(node_pos), 2 if 'Projet' in node.id else 0))
 
         for edge in self.edges:
             if edge.parent_node.id not in ['start', 'end'] and edge.child_node.id not in ['start', 'end']:
+
+                color = 'gray'
+
+                if edge.parent_node.label + edge.child_node.label == edge.weigh:
+                    color = 'black'
+
                 g.add_edge(f'{edge.parent_node.id}:{edge.parent_node.label}',
-                           f'{edge.child_node.id}:{edge.child_node.label}')
+                           f'{edge.child_node.id}:{edge.child_node.label}', weight=edge.weigh, length=100, color=color)
 
         if bipartite:
             X, Y = nx.bipartite.sets(g)
@@ -139,18 +155,38 @@ class Graph:
                        for i, n in enumerate(X))  # put nodes from X at x=1
             pos.update((n, (2, i))
                        for i, n in enumerate(Y))  # put nodes from Y at x=2
-            nx.draw(g, pos=pos, with_labels=True)
 
-            if kwargs['title']:
-                plt.title(kwargs['title'])
+            edges = g.edges()
+            colors = [g[u][v]['color'] for u, v in edges]
+            weights = [g[u][v]['weight'] for u, v in edges]
 
+            positions = nx.get_node_attributes(g, 'pos')
+            nx.draw(g, pos=positions, edge_color=colors,
+                    width=weights, with_labels=True)
+
+            labels = nx.get_edge_attributes(g, 'weight')
+
+            nx.draw_networkx_edge_labels(
+                g, positions, edge_labels=labels, label_pos=0.2)
+
+            plt.title(title)
             plt.show()
         else:
-            nx.draw(g, with_labels=True)
 
-            if kwargs['title']:
-                plt.title(kwargs['title'])
+            edges = g.edges()
+            colors = [g[u][v]['color'] for u, v in edges]
+            weights = [2 for u, v in edges]
 
+            positions = nx.get_node_attributes(g, 'pos')
+            nx.draw(g, positions, edge_color=colors,
+                    width=weights, with_labels=True)
+
+            labels = nx.get_edge_attributes(g, 'weight')
+
+            nx.draw_networkx_edge_labels(
+                g, positions, edge_labels=labels, label_pos=0.2)
+
+            plt.title(title)
             plt.show()
 
     def get_equality_graph(self):
