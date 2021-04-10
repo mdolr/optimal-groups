@@ -1,20 +1,27 @@
 import sys
 import getopt
+import json
 from src.common.data import create_graph
 from src.implementations.hungarian import Hungarian
 
 # Options par defaut
 DEFAULT_OPTIONS = {
-    # chemin vers le fichier d'entree contenant les donnees
-    # a traiter
-    'i': './source.csv',
+    # chemin vers le fichier d'entree contenant
+    # la liste des groupes et les preferences
+    'g': './test_groups.csv',
+
+    # chemin vers le fichier d'entree contenant
+    # la liste des projets et leur capacite
+    'p': './test_projects.csv',
 
     # chemin vers le fichier de sortie contenant
     # les resultats
-    'o': './affectation.txt',
+    'o': './outputs.txt',
 
-    # algorithme a utiliser
-    'a': 'kuhn'
+    # implementation a utiliser
+    'i': 'hungarian',
+
+    'debug': False
 }
 
 options = {}
@@ -24,34 +31,42 @@ options = {}
 # a l'aide de python main.py
 if __name__ == '__main__':
     # on commence par recuperer les arguments
-    # -i <chemin_fichier_entree>
+    # -g <chemin_fichier_entree>
+    # -p <chemin_fichier_entree>
     # -o <chemin_fichier_sortie>
-    # -a <algorithme>
+    # -i <algorithme>
 
     try:
         # on enleve le nom du fichier des args
-        opts, args = getopt.getopt(sys.argv[1:], 'i:o:a:')
+        opts, args = getopt.getopt(
+            sys.argv[1:], 'g:p:o:i:', longopts=['debug'])
 
     # au cas ou des options avec arguments manquent d'un argument
     # on redonne la syntaxe de la commande
     except getopt.GetoptError:
-        print('Correct syntax: main.py -i <inputfile> -o <outputfile> -a <algorithm>\nExample: main.py -i ./source.csv -o ./output.txt -a kuhn')
+        print('Correct syntax: main.py -g <groups_data_file> -p <projects_data_file> -o <outputs_file> -i <algorithm>')
         sys.exit(2)
 
     for opt, arg in opts:
         # on veut traiter les arguments sans le -
-        opt = opt.replace('-', '')
+        opt = opt.replace('--', '').replace('-', '')
         options[opt] = arg
+
+        if opt == 'debug':
+            options['debug'] = True
 
     # on remplace les valeurs par defauts pour les arguments precises
     DEFAULT_OPTIONS.update(options)
 
     #graph = create_graph('choix.csv', 'project.csv')
-    graph = create_graph('m9_groupes.csv', 'm9_projects.csv')
+    graph = create_graph(DEFAULT_OPTIONS['g'], DEFAULT_OPTIONS['p'])
 
-    algorithm = Hungarian(graph=graph)
-    matching_graph = algorithm.solve()
-    matching_graph.draw(bipartite=False, title='Graph final')
+    algorithm = Hungarian(graph=graph, debug=DEFAULT_OPTIONS['debug'])
+    matching = algorithm.solve()
+
+    if DEFAULT_OPTIONS['debug']:
+        print(json.dumps(matching['outputs'], sort_keys=True, indent=4))
+        matching['graph'].draw(bipartite=False, title='Graph final')
 
     # lancer la recuperation des donnees
     # creer le graph
