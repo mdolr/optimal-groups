@@ -43,17 +43,18 @@ class Graph:
 
         return node
 
-    def remove_node(self, node):
+    def remove_node(self, delete_node):
         """
         Supprime une node et ses edges du reseau
         """
-        for edge in node.outgoing_edges:
-            self.remove_edge(node, edge.child_node)
+        for edge in delete_node.outgoing_edges:
+            self.remove_edge(delete_node, edge.child_node)
 
-        for edge in node.incoming_edges:
-            self.remove_edge(edge.parent_node, node)
+        for edge in delete_node.incoming_edges:
+            self.remove_edge(edge.parent_node, delete_node)
 
-        self.nodes.pop(node)
+        # On filtre la node qu'on veut supprimer
+        self.nodes = [node for node in self.nodes if delete_node.id != node.id]
 
         return True
 
@@ -87,12 +88,19 @@ class Graph:
         False sinon
         """
 
-        edge = self.get_edge(parent_node, child_node)
+        delete_edge = self.get_edge(parent_node, child_node)
 
-        if edge:
-            parent_node.outgoing_edges.pop(edge)
-            child_node.incoming_edges.pop(edge)
-            self.edges.pop(edge)
+        if delete_edge:
+            # On filtre l'edge qu'on veut supprimer
+            parent_node.outgoing_edges = [
+                edge for edge in parent_node.outgoing_edges if delete_edge.id != edge.id]
+
+            child_node.incoming_edges = [
+                edge for edge in child_node.incoming_edges if delete_edge.id != edge.id]
+
+            self.edges = [
+                edge for edge in self.edges if delete_edge.id != edge.id]
+
             return True
 
         else:

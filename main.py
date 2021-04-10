@@ -53,17 +53,6 @@ if __name__ == '__main__':
     matching_graph = algorithm.solve()
     matching_graph.draw(bipartite=False, title='Graph final')
 
-    """
-    graph = Graph()
-    graph.add_node(starting_node=True)
-
-    for i in range(0, 5):
-        node = graph.add_node()
-        graph.add_edge(graph.starting_node, node)
-
-
-    print([edge.graph.next_id for edge in graph.starting_node.edges])
-    """
     # lancer la recuperation des donnees
     # creer le graph
     # une fois le graph creer traiter le graph avec l'algo

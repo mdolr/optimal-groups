@@ -65,13 +65,13 @@ class Hungarian:
             ...
             """
             print(f'Finding path from {last_node.id}\n- S={S}\n- T={T}')
-
+            """
             self.graph.draw(bipartite=False,
                             title=f'Find path from {last_node.id} - Full graph')
 
             equality_graph.draw(
                 bipartite=False, title=f'Find path from {last_node.id} - Equality graph')
-
+            """
             # On a un groupe
             # On veut trouver un augmenting path (i.e un chemin qui zig zag)
             # qui termine dans un projet non sature
@@ -167,8 +167,6 @@ class Hungarian:
 
                 return find_path(last_node=new_last_node, equality_graph=equality_graph, S=S, T=T, starting_node_id=starting_node_id)
 
-            # elif 'Projet' in last_node.id:
-
         # On fait tourner une premiere fois la fonction pour trouver un augmenting path
         find_path(last_node=base_equality_graph.get_node_by_id(starting_node_id),
                   equality_graph=base_equality_graph, S=[starting_node_id], T=[], starting_node_id=starting_node_id, rewrite_matching=False)
@@ -177,45 +175,6 @@ class Hungarian:
 
         # Puis une 2nde fois en lui demandant de reecrire le matching avec le chemin le plus court cette fois ci
         return find_path(last_node=self.graph.get_equality_graph().get_node_by_id(starting_node_id), equality_graph=self.graph.get_equality_graph(), S=[starting_node_id], T=[], starting_node_id=starting_node_id, rewrite_matching=True)
-
-        """
-        def find_path(last_node, S, T):
-            # Pour les groupes
-            if 'Groupe' in last_node.id:
-                # On explore les noeuds enfants
-                for edge in last_node.outgoing_edges:
-                    # A la recherche d'un noeud pas visite
-                    if not edge.child_node.id in T:
-                        # si le noeud n'est pas sature on s'arrete
-                        if not edge.child_node.is_saturated():
-                            print(
-                                f'{edge.parent_node.id} to {edge.child_node.id} W: {edge.weigh}')
-                            last_node = equality_graph.get_node_by_id(
-                                edge.child_node.id)
-                            T.append(last_node.id)
-                            # return f'{edge.parent_node.id} to {edge.child_node.id} W: {edge.weigh}'
-
-                # si on en trouve aucune pas sature
-                # sinon on retravaille les poids des noeuds
-                # et on refait un nouveau graph d'egalite
-                if len([edge for edge in last_node.outgoing_edges if not edge.child_node.is_saturated()]) == 0:
-                    self.delta_update_labels(T, S)
-                    equality_graph = self.graph.get_equality_graph()
-                    return find_path(last_node=last_node, S=S, T=T)
-
-            # Pour les projets
-            elif 'Projet' in last_node.id:
-                # On explore les noeuds parents
-                for edge in last_node.incoming_edges:
-                    # A la recherche d'un noeud pas visite
-                    if not edge.parent_node.id in S:
-                        last_node = equality_graph.get_node_by_id(
-                            edge.parent_node.id)
-                        S.append(last_node.id)
-                        return find_path(last_node=last_node, S=S, T=T)
-
-        return find_path(last_node=equality_graph.get_node_by_id(starting_node_id), S=[starting_node_id], T=[])
-        """
 
     def update_matching(self, S, T):
         """
@@ -226,8 +185,6 @@ class Hungarian:
         # On commence par remettre a 0 les connexions si les noeuds
         # existent deja dans le matching en les supprimant
         # puis en les recreant
-        # self.matching.draw(
-        #    bipartite=False, title='Graph avant update matching')
 
         for node_id in S:
             if self.matching.get_node_by_id(node_id):
@@ -267,42 +224,13 @@ class Hungarian:
 
             self.matching.add_edge(self.matching.get_node_by_id(
                 S[i]), self.matching.get_node_by_id(T[i]), weigh=edge.weigh)
-
+        """
         self.matching.draw(
             bipartite=False, title='Updated matching - Matching graph')
 
         self.graph.draw(bipartite=False, title='Updated matching - Full graph')
-
-        return self.matching
         """
-
-              if self.matching.get_node_by_id(edge.child_node.id):
-                  self.matching.remove_node(
-                      self.matching.get_node_by_id(edge.child_node.id))
-
-              matching_child = self.matching.add_node(
-                  id=edge.child_node.id,
-                  name=edge.child_node.name,
-                  label=edge.child_node.label,
-                  limit_capacity=edge.child_node.limit_capacity,
-                  current_capacity=edge.child_node.current_capacity)
-
-              if self.matching.get_node_by_id(edge.parent_node.id):
-                  self.matching.remove_node(
-                      self.matching.get_node_by_id(edge.parent_node.id))
-
-              matching_parent = self.matching.add_node(
-                  id=edge.parent_node.id,
-                  name=edge.parent_node.name,
-                  label=edge.parent_node.label,
-                  limit_capacity=edge.parent_node.limit_capacity,
-                  current_capacity=edge.parent_node.current_capacity)
-
-              self.matching.add_edge(
-                  matching_parent, matching_child)
-
-              return 't'
-            """
+        return self.matching
 
     def initalize_labels(self, graph):
         """
@@ -316,7 +244,7 @@ class Hungarian:
             # on met a jour la valeur du noeud comme le plus haut poids
             edge.child_node.label = int(highest_weigh)
 
-        self.graph.draw(bipartite=False, title='Initialize labels')
+        # self.graph.draw(bipartite=False, title='Initialize labels')
 
     def delta_update_labels(self, S, T):
         """
@@ -325,9 +253,6 @@ class Hungarian:
         """
         print(f'Updating labels using the following\n- S={S}\n- T={T}')
         delta = None
-
-        # self.graph.draw(
-        #    bipartite=False, title='Graph avant update labels')
 
         # On veut calculer le delta minimum
         for node_id in S:
@@ -339,7 +264,8 @@ class Hungarian:
                 # on veut calculer le delta de chaque connexion vers
                 # un noeud pas inclus dans T
                 if not(edge.child_node.id in T):
-                    print(f'Delta : {(int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weigh))} {edge.parent_node.label} ({edge.parent_node.id}) + {edge.child_node.label} ({edge.child_node.id}) - {edge.weigh}')
+                    print(
+                        f'Calculating Delta : {(int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weigh))} {edge.parent_node.label} ({edge.parent_node.id}) + {edge.child_node.label} ({edge.child_node.id}) - {edge.weigh}')
 
                     # on recherche le delta minimum
                     if delta is None or (int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weigh)) < delta:
@@ -349,7 +275,7 @@ class Hungarian:
 
         # Une fois delta trouve on veut update les valeur de chaque noeud
         if delta is not None:
-            print(f'BLABLABLABLABLABLA JE SUIS DELTA {delta}')
+            print(f'Delta={delta}')
             # Les noeuds de la categorie S (les groupes)
             # se font enlever delta
             for node_id in S:
@@ -361,11 +287,9 @@ class Hungarian:
             for node_id in T:
                 node = self.graph.get_node_by_id(node_id)
                 node.label += delta
-
+        """
         self.graph.get_equality_graph().draw(
             bipartite=False, title='Updated labels - Equality graph')
 
         self.graph.draw(bipartite=False, title='Updated labels - Full graph')
-
-        # self.graph.draw(
-        #    bipartite=False, title='Graph apres update labels')
+        """
