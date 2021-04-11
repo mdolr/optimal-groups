@@ -67,7 +67,8 @@ if __name__ == '__main__':
     algorithm = Hungarian(graph=graph, debug=DEFAULT_OPTIONS['debug'])
     matching = algorithm.solve()
 
-    create_output_file(matching['outputs'], DEFAULT_OPTIONS['o'])
+    create_output_file(
+        matching['outputs'], DEFAULT_OPTIONS['o'], weighing_method=DEFAULT_OPTIONS['w'])
 
     if DEFAULT_OPTIONS['debug']:
         print(json.dumps(matching['outputs'],  indent=4))
