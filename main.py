@@ -1,7 +1,7 @@
 import sys
 import getopt
 import json
-from src.common.data import create_graph
+from src.common.data import create_graph, create_output_file
 from src.implementations.hungarian import Hungarian
 
 # Options par defaut
@@ -62,6 +62,7 @@ if __name__ == '__main__':
 
     algorithm = Hungarian(graph=graph, debug=DEFAULT_OPTIONS['debug'])
     matching = algorithm.solve()
+    create_output_file(matching['outputs'], DEFAULT_OPTIONS['o'])
 
     # if DEFAULT_OPTIONS['debug']:
     print(json.dumps(matching['outputs'],  indent=4))

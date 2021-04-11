@@ -16,6 +16,18 @@ def load_data(path):
     return reader, header
 
 
+def create_output_file(graph, output_file):
+
+    f = open(output_file, "w")
+
+    for group in graph:
+        match = graph.get(group)
+        f.write(str(group) + ' : ' + str(match.get("destination_node_id")
+                                         ) + ' - Score : ' + str(match.get("weigh")) + '\n')
+
+    f.close()
+
+
 def create_graph(group_path, project_path):
     graph = Graph()
     graph.add_node(starting_node=True, id='start')

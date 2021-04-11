@@ -1,0 +1,4 @@
+Groupe1 : Projet1 - Score : 4
+Groupe2 : Projet4 - Score : 4
+Groupe3 : Projet2 - Score : 3
+Groupe4 : Projet3 - Score : 3
