@@ -58,15 +58,14 @@ if __name__ == '__main__':
     # on remplace les valeurs par defauts pour les arguments precises
     DEFAULT_OPTIONS.update(options)
 
-    #graph = create_graph('choix.csv', 'project.csv')
     graph = create_graph(DEFAULT_OPTIONS['g'], DEFAULT_OPTIONS['p'])
 
     algorithm = Hungarian(graph=graph, debug=DEFAULT_OPTIONS['debug'])
     matching = algorithm.solve()
 
-    if DEFAULT_OPTIONS['debug']:
-        print(json.dumps(matching['outputs'], sort_keys=True, indent=4))
-        matching['graph'].draw(bipartite=False, title='Graph final')
+    # if DEFAULT_OPTIONS['debug']:
+    print(json.dumps(matching['outputs'],  indent=4))
+    matching['graph'].draw(bipartite=False, title='Graph final')
 
     # lancer la recuperation des donnees
     # creer le graph

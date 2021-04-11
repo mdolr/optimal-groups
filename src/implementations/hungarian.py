@@ -1,3 +1,4 @@
+import json
 from ..structures.graph import Graph
 
 
@@ -163,7 +164,7 @@ class Hungarian:
 
                 # Sinon on delta update
                 else:
-                    self.delta_update_labels(S=S, T=T)
+                    delta = self.update_delta_labels(S=S, T=T)
 
                     S = [starting_node_id]
                     T = []
@@ -172,7 +173,7 @@ class Hungarian:
                     new_last_node = equality_graph.get_node_by_id(
                         starting_node_id)
 
-                return find_path(last_node=new_last_node, equality_graph=equality_graph, S=S, T=T, starting_node_id=starting_node_id)
+                return find_path(last_node=new_last_node, equality_graph=equality_graph, S=S, T=T, starting_node_id=starting_node_id, rewrite_matching=rewrite_matching)
 
         # On fait tourner une premiere fois la fonction pour trouver un augmenting path
         find_path(last_node=base_equality_graph.get_node_by_id(starting_node_id),
@@ -198,6 +199,8 @@ class Hungarian:
             edge = self.graph.get_edge(self.graph.get_node_by_id(
                 S[i]), self.graph.get_node_by_id(T[i]))
 
+            print(
+                f'outputs[{S[i]}] = <weigh = {edge.weigh}, destination_node_id = {T[i]}>')
             self.outputs[S[i]] = {'weigh': int(edge.weigh),
                                   'destination_node_id': T[i]}
 
@@ -209,12 +212,15 @@ class Hungarian:
             destination_node_original = self.graph.get_node_by_id(
                 connection['destination_node_id'])
 
-            source_node = self.matching.add_node(
-                id=source_node_original.id,
-                name=source_node_original.name,
-                label=source_node_original.label,
-                limit_capacity=source_node_original.limit_capacity,
-                current_capacity=source_node_original.current_capacity)
+            source_node = self.matching.get_node_by_id(source_node_id)
+
+            if not source_node:
+                source_node = self.matching.add_node(
+                    id=source_node_original.id,
+                    name=source_node_original.name,
+                    label=source_node_original.label,
+                    limit_capacity=source_node_original.limit_capacity,
+                    current_capacity=source_node_original.current_capacity)
 
             destination_node = self.matching.get_node_by_id(
                 connection['destination_node_id'])
@@ -233,6 +239,8 @@ class Hungarian:
         if self.debug:
             self.matching.draw(
                 bipartite=False, title='Updated matching - Matching graph')
+
+            print(json.dumps(self.outputs, indent=4))
 
             self.graph.draw(bipartite=False,
                             title='Updated matching - Full graph')
@@ -254,7 +262,7 @@ class Hungarian:
         if self.debug:
             self.graph.draw(bipartite=False, title='Initialize labels')
 
-    def delta_update_labels(self, S, T):
+    def update_delta_labels(self, S, T):
         """
         Mise a jour des valeurs de chaque noeud avec calcul
         du delta minimum
@@ -280,15 +288,18 @@ class Hungarian:
                             f'Calculating Delta : {(int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weigh))} {edge.parent_node.label} ({edge.parent_node.id}) + {edge.child_node.label} ({edge.child_node.id}) - {edge.weigh}')
 
                     # on recherche le delta minimum
-                    if delta is None or (int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weigh)) < delta:
-                        delta = (int(edge.parent_node.label) +
-                                 int(edge.child_node.label) -
-                                 int(edge.weigh))
+                    edge_delta = (int(edge.parent_node.label) +
+                                  int(edge.child_node.label) - int(edge.weigh))
+
+                    if delta is None or edge_delta < delta:
+                        if edge_delta > 0:
+                            delta = edge_delta
+
+        if self.debug:
+            print(f'Delta={delta}')
 
         # Une fois delta trouve on veut update les valeur de chaque noeud
         if delta is not None:
-            if self.debug:
-                print(f'Delta={delta}')
             # Les noeuds de la categorie S (les groupes)
             # se font enlever delta
             for node_id in S:
@@ -307,3 +318,5 @@ class Hungarian:
 
             self.graph.draw(bipartite=False,
                             title='Updated labels - Full graph')
+
+        return delta
