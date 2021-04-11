@@ -166,6 +166,10 @@ class Hungarian:
                 else:
                     delta = self.update_delta_labels(S=S, T=T)
 
+                    if delta == 0:
+                        raise Exception(
+                            f'Probleme potentiel pour le groupe {starting_node_id}, pas de solution ? (Delta 0)')
+
                     S = [starting_node_id]
                     T = []
 
@@ -177,7 +181,9 @@ class Hungarian:
 
         # On fait tourner une premiere fois la fonction pour trouver un augmenting path
         find_path(last_node=base_equality_graph.get_node_by_id(starting_node_id),
-                  equality_graph=base_equality_graph, S=[starting_node_id], T=[], starting_node_id=starting_node_id, rewrite_matching=False)
+                  equality_graph=base_equality_graph, S=[
+                      starting_node_id], T=[],
+                  starting_node_id=starting_node_id, rewrite_matching=False)
 
         if self.debug:
             print('Found path, recomputing shortest path to update matching')
@@ -199,8 +205,6 @@ class Hungarian:
             edge = self.graph.get_edge(self.graph.get_node_by_id(
                 S[i]), self.graph.get_node_by_id(T[i]))
 
-            print(
-                f'outputs[{S[i]}] = <weigh = {edge.weigh}, destination_node_id = {T[i]}>')
             self.outputs[S[i]] = {'weigh': int(edge.weigh),
                                   'destination_node_id': T[i]}
 
@@ -292,8 +296,7 @@ class Hungarian:
                                   int(edge.child_node.label) - int(edge.weigh))
 
                     if delta is None or edge_delta < delta:
-                        if edge_delta > 0:
-                            delta = edge_delta
+                        delta = edge_delta
 
         if self.debug:
             print(f'Delta={delta}')
