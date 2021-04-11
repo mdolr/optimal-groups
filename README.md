@@ -45,6 +45,7 @@ Pour lancer le programme sans arguments `python main.py`
 - `-g /chemin/vers/le/fichier.csv` pour préciser le fichier d'entrée contenant les groupes et leurs préférences
 - `-p /chemin/vers/le/fichier.csv` pour préciser le fichier d'entrée contenant les projets et leur capacité
 - `-o /chemin/vers/le/fichier.txt` pour préciser l'endroit où le fichier de sortie sera créé.
+- `-w fibonacci | decreasing` permet de préciser la méthode à utiliser pour l'attribution des poids des préférences
 
 ## Données
 

@@ -32,7 +32,7 @@ def create_output_file(matching_outputs, output_file_path):
     f.close()
 
 
-def create_graph(group_path, project_path):
+def create_graph(group_path, project_path, weighing_method='decreasing'):
     graph = Graph()
     graph.add_node(starting_node=True, id='start')
     graph.add_node(ending_node=True, id='end')

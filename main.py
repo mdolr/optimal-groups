@@ -21,6 +21,9 @@ DEFAULT_OPTIONS = {
     # implementation a utiliser
     'i': 'hungarian',
 
+    # method de calcul des poids
+    'w': 'decreasing',
+
     'debug': False
 }
 
@@ -39,12 +42,12 @@ if __name__ == '__main__':
     try:
         # on enleve le nom du fichier des args
         opts, args = getopt.getopt(
-            sys.argv[1:], 'g:p:o:i:', longopts=['debug'])
+            sys.argv[1:], 'g:p:o:i:w:', longopts=['debug'])
 
     # au cas ou des options avec arguments manquent d'un argument
     # on redonne la syntaxe de la commande
     except getopt.GetoptError:
-        print('Correct syntax: main.py -g <groups_data_file> -p <projects_data_file> -o <outputs_file> -i <algorithm>')
+        print('Correct syntax: main.py -g <groups_data_file> -p <projects_data_file> -o <outputs_file> -i <algorithm> -w <weighing_method>')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -58,7 +61,8 @@ if __name__ == '__main__':
     # on remplace les valeurs par defauts pour les arguments precises
     DEFAULT_OPTIONS.update(options)
 
-    graph = create_graph(DEFAULT_OPTIONS['g'], DEFAULT_OPTIONS['p'])
+    graph = create_graph(
+        DEFAULT_OPTIONS['g'], DEFAULT_OPTIONS['p'], weighing_method=DEFAULT_OPTIONS['w'])
 
     algorithm = Hungarian(graph=graph, debug=DEFAULT_OPTIONS['debug'])
     matching = algorithm.solve()
