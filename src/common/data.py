@@ -1,6 +1,7 @@
 from src.structures.node import Node
 from src.structures.edge import Edge
 from src.structures.graph import Graph
+from src.common.weight import get_weight
 import csv
 
 
@@ -81,7 +82,8 @@ def create_graph(group_path, project_path, weighing_method='decreasing'):
         for i in range(1, len(row)):
             graph.add_edge(parent_node=node,
                            child_node=graph.get_node_by_id(row[i]),
-                           weight=int(len(row) - i),
+                           weight=get_weight(
+                               int(len(row) - i), method='weighing_method'),
                            limit_capacity=capacity.get(row[i], 0))
 
     """
