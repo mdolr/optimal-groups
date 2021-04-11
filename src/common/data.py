@@ -16,14 +16,18 @@ def load_data(path):
     return reader, header
 
 
-def create_output_file(graph, output_file):
+def create_output_file(matching_outputs, output_file_path):
 
-    f = open(output_file, "w")
+    f = open(output_file_path, "w")
+    weigh_sum = 0
 
-    for group in graph:
-        match = graph.get(group)
-        f.write(str(group) + ' : ' + str(match.get("destination_node_id")
-                                         ) + ' - Score : ' + str(match.get("weigh")) + '\n')
+    for group, connection in matching_outputs.items():
+        weigh_sum += int(connection['weigh'])
+
+        line = f"{group} : {connection['destination_node_id']} - Score : {connection['weigh']}\n"
+        f.write(line)
+
+    # f.write(f'\nSatisfaction score : {weigh_sum} / {5 } ({})')
 
     f.close()
 
