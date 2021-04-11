@@ -1,6 +1,3 @@
-from src.common.data import load_data
-
-
 def get_weight(index, method='decreasing'):
     if method == 'fibonacci':
         return fibo(index)
@@ -8,9 +5,18 @@ def get_weight(index, method='decreasing'):
         return index
 
 
-def get_max_weight(group_path, method='decreasing'):
-    group_rows, groups_data = load_data(group_path)
-    return fibo(len(group_rows[0]) - 1) if method == 'fibonacci' else len(group_rows[0]) - 1
+def get_max_weight(group_file_path, method='decreasing'):
+    # avoid circular reference
+    from src.common.data import load_data
+
+    group_rows, groups_data = load_data(group_file_path)
+
+    # group_rows != array
+    for row in group_rows:
+        if method == 'fibonacci':
+            return fibo(len(row) - 1)
+        else:
+            return len(row) - 1
 
 
 def fibo(n):

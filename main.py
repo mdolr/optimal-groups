@@ -68,7 +68,7 @@ if __name__ == '__main__':
     matching = algorithm.solve()
 
     create_output_file(
-        matching['outputs'], DEFAULT_OPTIONS['o'], weighing_method=DEFAULT_OPTIONS['w'])
+        matching['outputs'], DEFAULT_OPTIONS['o'], group_file_path=DEFAULT_OPTIONS['g'], weighing_method=DEFAULT_OPTIONS['w'])
 
     if DEFAULT_OPTIONS['debug']:
         print(json.dumps(matching['outputs'],  indent=4))

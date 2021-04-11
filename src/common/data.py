@@ -2,7 +2,7 @@ from src.structures.node import Node
 from src.structures.edge import Edge
 from src.structures.graph import Graph
 from src.common.weight import get_weight, get_max_weight
-from main import DEFAULT_OPTIONS
+
 import csv
 
 
@@ -18,21 +18,25 @@ def load_data(path):
     return reader, header
 
 
-def create_output_file(matching_outputs, output_file_path, weighing_method='decreasing'):
+def create_output_file(matching_outputs, output_file_path, group_file_path, weighing_method='decreasing'):
 
     f = open(output_file_path, "w")
+
     weight_sum = 0
+    max_weight_sum = 0
+
+    max_weight = get_max_weight(
+        group_file_path=group_file_path, method=weighing_method)
 
     for group, connection in matching_outputs.items():
         weight_sum += int(connection['weight'])
+        max_weight_sum += max_weight
 
         line = f"{group} : {connection['destination_node_id']} - Score : {connection['weight']}\n"
         f.write(line)
 
-    if weighing_method == 'fibonacci':
-        f.write(f'\nSatisfaction score : {weight_sum} / {get_max_weight(DEFAULT_OPTIONS['g']),weighing_method)}')
-    else:
-        f.write(f'\nSatisfaction score : {weight_sum} / {get_max_weight(DEFAULT_OPTIONS['g']),weighing_method)}')
+    f.write(
+        f'\nSatisfaction score : {weight_sum} / {max_weight_sum } ({(weight_sum * 100 / max_weight_sum):.2f}%)')
 
     f.close()
 
