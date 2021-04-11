@@ -8,11 +8,11 @@ from src.implementations.hungarian import Hungarian
 DEFAULT_OPTIONS = {
     # chemin vers le fichier d'entree contenant
     # la liste des groupes et les preferences
-    'g': './test_groups.csv',
+    'g': './test_data/test_groups.csv',
 
     # chemin vers le fichier d'entree contenant
     # la liste des projets et leur capacite
-    'p': './test_projects.csv',
+    'p': './test_data/test_projects.csv',
 
     # chemin vers le fichier de sortie contenant
     # les resultats
