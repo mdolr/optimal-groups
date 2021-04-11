@@ -8,7 +8,7 @@ class Edge:
 
         self.graph = kwargs.pop('graph', None)
 
-        self.weigh = kwargs.pop('weigh', 0)
+        self.weight = kwargs.pop('weight', 0)
 
         self.current_capacity = kwargs.pop('current_capacity', 0)
         self.limit_capacity = kwargs.pop('limit_capacity', 0)

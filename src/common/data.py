@@ -19,15 +19,15 @@ def load_data(path):
 def create_output_file(matching_outputs, output_file_path):
 
     f = open(output_file_path, "w")
-    weigh_sum = 0
+    weight_sum = 0
 
     for group, connection in matching_outputs.items():
-        weigh_sum += int(connection['weigh'])
+        weight_sum += int(connection['weight'])
 
-        line = f"{group} : {connection['destination_node_id']} - Score : {connection['weigh']}\n"
+        line = f"{group} : {connection['destination_node_id']} - Score : {connection['weight']}\n"
         f.write(line)
 
-    # f.write(f'\nSatisfaction score : {weigh_sum} / {5 } ({})')
+    # f.write(f'\nSatisfaction score : {weight_sum} / {5 } ({})')
 
     f.close()
 
@@ -81,7 +81,7 @@ def create_graph(group_path, project_path):
         for i in range(1, len(row)):
             graph.add_edge(parent_node=node,
                            child_node=graph.get_node_by_id(row[i]),
-                           weigh=int(len(row) - i),
+                           weight=int(len(row) - i),
                            limit_capacity=capacity.get(row[i], 0))
 
     """

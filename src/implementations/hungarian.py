@@ -111,7 +111,7 @@ class Hungarian:
                             # Si c'est le lien final
                             if self.debug:
                                 print(
-                                    f'Final link found {edge.parent_node.id} to {edge.child_node.id} W: {edge.weigh}')
+                                    f'Final link found {edge.parent_node.id} to {edge.child_node.id} W: {edge.weight}')
 
                             # On a trouve une destination non saturee
                             # dans le cote des projets c'est a dire un augmenting path
@@ -205,7 +205,7 @@ class Hungarian:
             edge = self.graph.get_edge(self.graph.get_node_by_id(
                 S[i]), self.graph.get_node_by_id(T[i]))
 
-            self.outputs[S[i]] = {'weigh': int(edge.weigh),
+            self.outputs[S[i]] = {'weight': int(edge.weight),
                                   'destination_node_id': T[i]}
 
         self.matching = Graph()
@@ -238,7 +238,7 @@ class Hungarian:
                     current_capacity=destination_node_original.current_capacity)
 
             self.matching.add_edge(
-                source_node, destination_node, weigh=int(connection['weigh']))
+                source_node, destination_node, weight=int(connection['weight']))
 
         if self.debug:
             self.matching.draw(
@@ -257,11 +257,11 @@ class Hungarian:
         """
         for edge in graph.starting_node.outgoing_edges:
             # Recherche de la connexion avec le poids le plus haut
-            highest_weigh = max(
-                [int(edge.weigh) for edge in edge.child_node.outgoing_edges])
+            highest_weight = max(
+                [int(edge.weight) for edge in edge.child_node.outgoing_edges])
 
             # on met a jour la valeur du noeud comme le plus haut poids
-            edge.child_node.label = int(highest_weigh)
+            edge.child_node.label = int(highest_weight)
 
         if self.debug:
             self.graph.draw(bipartite=False, title='Initialize labels')
@@ -289,11 +289,11 @@ class Hungarian:
 
                     if self.debug:
                         print(
-                            f'Calculating Delta : {(int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weigh))} {edge.parent_node.label} ({edge.parent_node.id}) + {edge.child_node.label} ({edge.child_node.id}) - {edge.weigh}')
+                            f'Calculating Delta : {(int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weight))} {edge.parent_node.label} ({edge.parent_node.id}) + {edge.child_node.label} ({edge.child_node.id}) - {edge.weight}')
 
                     # on recherche le delta minimum
                     edge_delta = (int(edge.parent_node.label) +
-                                  int(edge.child_node.label) - int(edge.weigh))
+                                  int(edge.child_node.label) - int(edge.weight))
 
                     if delta is None or edge_delta < delta:
                         delta = edge_delta

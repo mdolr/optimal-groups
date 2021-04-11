@@ -150,11 +150,11 @@ class Graph:
 
                 color = 'gray'
 
-                if edge.parent_node.label + edge.child_node.label == edge.weigh:
+                if edge.parent_node.label + edge.child_node.label == edge.weight:
                     color = 'black'
 
                 g.add_edge(f'{edge.parent_node.id}:{edge.parent_node.label}',
-                           f'{edge.child_node.id}:{edge.child_node.label}', weight=edge.weigh, length=100, color=color)
+                           f'{edge.child_node.id}:{edge.child_node.label}', weightt=edge.weight, length=100, color=color)
 
         if bipartite:
             X, Y = nx.bipartite.sets(g)
@@ -166,13 +166,13 @@ class Graph:
 
             edges = g.edges()
             colors = [g[u][v]['color'] for u, v in edges]
-            weights = [g[u][v]['weight'] for u, v in edges]
+            weightts = [g[u][v]['weightt'] for u, v in edges]
 
             positions = nx.get_node_attributes(g, 'pos')
             nx.draw(g, pos=positions, edge_color=colors,
-                    width=weights, with_labels=True)
+                    width=weightts, with_labels=True)
 
-            labels = nx.get_edge_attributes(g, 'weight')
+            labels = nx.get_edge_attributes(g, 'weightt')
 
             nx.draw_networkx_edge_labels(
                 g, positions, edge_labels=labels, label_pos=0.2)
@@ -183,13 +183,13 @@ class Graph:
 
             edges = g.edges()
             colors = [g[u][v]['color'] for u, v in edges]
-            weights = [2 for u, v in edges]
+            weightts = [2 for u, v in edges]
 
             positions = nx.get_node_attributes(g, 'pos')
             nx.draw(g, positions, edge_color=colors,
-                    width=weights, with_labels=True)
+                    width=weightts, with_labels=True)
 
-            labels = nx.get_edge_attributes(g, 'weight')
+            labels = nx.get_edge_attributes(g, 'weightt')
 
             nx.draw_networkx_edge_labels(
                 g, positions, edge_labels=labels, label_pos=0.2)
@@ -239,12 +239,12 @@ class Graph:
 
             # Puis on relie les noeuds remplissant la condition d'egalite
             for middle_edge in edge.child_node.outgoing_edges:
-                if middle_edge.weigh == (middle_edge.parent_node.label + middle_edge.child_node.label):
+                if middle_edge.weight == (middle_edge.parent_node.label + middle_edge.child_node.label):
                     edge = equality_graph.add_edge(
                         parent_node=equality_graph.get_node_by_id(
                             middle_edge.parent_node.id),
                         child_node=equality_graph.get_node_by_id(
                             middle_edge.child_node.id),
-                        weigh=middle_edge.weigh)
+                        weight=middle_edge.weight)
 
         return equality_graph
