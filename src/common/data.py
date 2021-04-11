@@ -83,7 +83,7 @@ def create_graph(group_path, project_path, weighing_method='decreasing'):
             graph.add_edge(parent_node=node,
                            child_node=graph.get_node_by_id(row[i]),
                            weight=get_weight(
-                               int(len(row) - i), method='weighing_method'),
+                               int(len(row) - i), method=weighing_method),
                            limit_capacity=capacity.get(row[i], 0))
 
     """

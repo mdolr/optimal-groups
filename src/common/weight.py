@@ -1,5 +1,5 @@
 def get_weight(index, method='decreasing'):
-    if method == 'fibo':
+    if method == 'fibonacci':
         return fibo(index)
     else:
         return index
