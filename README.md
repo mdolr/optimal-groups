@@ -53,7 +53,7 @@ Les fichiers d'entrée doivent être au format CSV.
 
 ### Groupes
 
-En-tête du fichier des groupes, [voir exemple](https://github.com/mdolr/affectation-groupe/blob/main/test_groups.csv)
+En-tête du fichier des groupes, [voir exemple](https://github.com/mdolr/affectation-groupe/blob/main/test_data/test_groups.csv)
 
 ```
 Groupe,Preference1,Preference2,Preference3,Preference4,Preference5
@@ -61,7 +61,7 @@ Groupe,Preference1,Preference2,Preference3,Preference4,Preference5
 
 ### Projets
 
-En-tête du fichier des projets, [voir exemple](https://github.com/mdolr/affectation-groupe/blob/main/test_projects.csv)
+En-tête du fichier des projets, [voir exemple](https://github.com/mdolr/affectation-groupe/blob/main/test_data/test_projects.csv)
 
 ```
 projectName,capacity
