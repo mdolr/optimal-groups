@@ -180,6 +180,9 @@ class Graph:
             plt.title(title)
             plt.show()
         else:
+            plt.figure(figsize=(10, 5))
+            ax = plt.gca()
+            ax.set_title(title)
 
             edges = g.edges()
             colors = [g[u][v]['color'] for u, v in edges]
@@ -192,9 +195,9 @@ class Graph:
             labels = nx.get_edge_attributes(g, 'weightt')
 
             nx.draw_networkx_edge_labels(
-                g, positions, edge_labels=labels, label_pos=0.2)
+                g, positions, edge_labels=labels, label_pos=0.2, ax=ax)
 
-            plt.title(title)
+            _ = ax.axis('off')
             plt.show()
 
     def get_equality_graph(self):
