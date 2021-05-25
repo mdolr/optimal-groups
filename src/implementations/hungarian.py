@@ -80,8 +80,9 @@ class Hungarian:
             if self.debug:
                 self.log(f'Finding path from {last_node.id}\n- S={S}\n- T={T}')
 
-                # self.graph.draw(bipartite=False,
-                #                title=f'Find path from {last_node.id} - Full graph')
+                self.log(f'Saving full graph - Step: {self.step}')
+                self.graph.draw(bipartite=False,
+                                title=f'Find path from {last_node.id} - Full graph', step=self.step)
 
                 self.log(f'Saving equality graph - Step: {self.step}')
 
@@ -257,8 +258,10 @@ class Hungarian:
 
             self.log(json.dumps(self.outputs, indent=4))
 
-            # self.graph.draw(bipartite=False,
-            #                title='Updated matching - Full graph')
+            self.log(
+                f'Saving full graph after updated matching - Step: {self.step}')
+            self.graph.draw(bipartite=False,
+                            title='Updated matching - Full graph', step=self.step)
 
         return self.matching
 
@@ -329,10 +332,14 @@ class Hungarian:
                 node.label += delta
 
         if self.debug:
-            # self.graph.get_equality_graph().draw(
-            #    bipartite=False, title='Updated labels - Equality graph')
+            self.log(
+                f'Saving updated equality graph after delta adjustment - Step: {self.step}')
+            self.graph.get_equality_graph().draw(
+                bipartite=False, title='Updated labels - Equality graph', step=self.step)
 
-            # self.graph.draw(bipartite=False,
-            #                title='Updated labels - Full graph')
+            self.log(
+                f'Saving updated full graph after delta adjustment - Step: {self.step}')
+            self.graph.draw(bipartite=False,
+                            title='Updated labels - Full graph', step=self.step)
 
             return delta
