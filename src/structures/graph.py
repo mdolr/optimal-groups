@@ -124,7 +124,7 @@ class Graph:
         """
         self.ending_node = node
 
-    def draw(self, bipartite, **kwargs):
+    def draw(self, bipartite, step, save=True, **kwargs):
         """
         Permet de dessiner le graphique pour debugger
         avec plus de confort
@@ -177,6 +177,7 @@ class Graph:
             nx.draw_networkx_edge_labels(
                 g, positions, edge_labels=labels, label_pos=0.2)
 
+            plt.savefig(f'./{step}.png')
             plt.title(title)
             plt.show()
         else:
@@ -190,7 +191,7 @@ class Graph:
 
             positions = nx.get_node_attributes(g, 'pos')
             nx.draw(g, positions, edge_color=colors,
-                    width=weightts, with_labels=True)
+                    width=weightts, with_labels=True, ax=ax)
 
             labels = nx.get_edge_attributes(g, 'weightt')
 
@@ -198,6 +199,7 @@ class Graph:
                 g, positions, edge_labels=labels, label_pos=0.2, ax=ax)
 
             _ = ax.axis('off')
+            plt.savefig(f'./{step}.png')
             plt.show()
 
     def get_equality_graph(self):

@@ -72,7 +72,12 @@ if __name__ == '__main__':
 
     if DEFAULT_OPTIONS['debug']:
         print(json.dumps(matching['outputs'],  indent=4))
-        matching['graph'].draw(bipartite=False, title='Graph final')
+        matching['graph'].draw(
+            bipartite=False, title='Graph final', step=algorithm.step + 1)
+
+        text_file = open('./logs.txt', 'w')
+        text_file.write(algorithm.logs)
+        text_file.close()
 
     # lancer la recuperation des donnees
     # creer le graph
