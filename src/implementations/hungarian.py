@@ -19,12 +19,19 @@ class Hungarian:
 
         self.matching = Graph()
         self.outputs = {}
+        self.logs = ''
+        self.step = 0
 
         self.init_matching()
 
     def init_matching(self):
         self.matching.add_node(starting_node=True, id='start')
         self.matching.add_node(ending_node=True, id='end')
+
+    def log(self, message):
+        self.step += 1
+        self.logs += message + '\n'
+        print(message)
 
     def solve(self):
         """
@@ -62,7 +69,7 @@ class Hungarian:
         """
 
         if self.debug:
-            print(
+            self.log(
                 f'Finding a full augmenting path, starting_node={starting_node_id}')
 
         def find_path(last_node, equality_graph, S, T, starting_node_id, rewrite_matching=False):
@@ -71,13 +78,15 @@ class Hungarian:
             """
 
             if self.debug:
-                print(f'Finding path from {last_node.id}\n- S={S}\n- T={T}')
+                self.log(f'Finding path from {last_node.id}\n- S={S}\n- T={T}')
 
-                self.graph.draw(bipartite=False,
-                                title=f'Find path from {last_node.id} - Full graph')
+                # self.graph.draw(bipartite=False,
+                #                title=f'Find path from {last_node.id} - Full graph')
+
+                self.log(f'Saving equality graph - Step: {self.step}')
 
                 equality_graph.draw(
-                    bipartite=False, title=f'Find path from {last_node.id} - Equality graph')
+                    bipartite=False, title=f'Find path from {last_node.id} - Equality graph', step=self.step)
 
             # On a un groupe
             # On veut trouver un augmenting path (i.e un chemin qui zig zag)
@@ -110,7 +119,7 @@ class Hungarian:
                         if not matching_child or not matching_child.is_saturated():
                             # Si c'est le lien final
                             if self.debug:
-                                print(
+                                self.log(
                                     f'Final link found {edge.parent_node.id} to {edge.child_node.id} W: {edge.weight}')
 
                             # On a trouve une destination non saturee
@@ -186,7 +195,7 @@ class Hungarian:
                   starting_node_id=starting_node_id, rewrite_matching=False)
 
         if self.debug:
-            print('Found path, recomputing shortest path to update matching')
+            self.log('Found path, recomputing shortest path to update matching')
 
         # Puis une 2nde fois en lui demandant de reecrire le matching avec le chemin le plus court cette fois ci
         return find_path(last_node=self.graph.get_equality_graph().get_node_by_id(starting_node_id), equality_graph=self.graph.get_equality_graph(), S=[starting_node_id], T=[], starting_node_id=starting_node_id, rewrite_matching=True)
@@ -199,7 +208,7 @@ class Hungarian:
         """
 
         if self.debug:
-            print(f'Update matching using\n- S={S}\n- T={T}')
+            self.log(f'Update matching using\n- S={S}\n- T={T}')
 
         for i in range(0, len(S)):
             edge = self.graph.get_edge(self.graph.get_node_by_id(
@@ -241,13 +250,15 @@ class Hungarian:
                 source_node, destination_node, weight=int(connection['weight']))
 
         if self.debug:
+            self.log(f'Saving matching graph - Step: {self.step}')
+
             self.matching.draw(
-                bipartite=False, title='Updated matching - Matching graph')
+                bipartite=False, title='Updated matching - Matching graph', step=self.step)
 
-            print(json.dumps(self.outputs, indent=4))
+            self.log(json.dumps(self.outputs, indent=4))
 
-            self.graph.draw(bipartite=False,
-                            title='Updated matching - Full graph')
+            # self.graph.draw(bipartite=False,
+            #                title='Updated matching - Full graph')
 
         return self.matching
 
@@ -264,7 +275,9 @@ class Hungarian:
             edge.child_node.label = int(highest_weight)
 
         if self.debug:
-            self.graph.draw(bipartite=False, title='Initialize labels')
+            self.log(f'Initializing label saving graph - Step: {self.step}')
+            self.graph.draw(bipartite=False,
+                            title='Initialize labels', step=self.step)
 
     def update_delta_labels(self, S, T):
         """
@@ -272,7 +285,7 @@ class Hungarian:
         du delta minimum
         """
         if self.debug:
-            print(f'Updating labels using the following\n- S={S}\n- T={T}')
+            self.log(f'Updating labels using the following\n- S={S}\n- T={T}')
 
         delta = None
 
@@ -288,7 +301,7 @@ class Hungarian:
                 if not(edge.child_node.id in T):
 
                     if self.debug:
-                        print(
+                        self.log(
                             f'Calculating Delta : {(int(edge.parent_node.label) + int(edge.child_node.label) - int(edge.weight))} {edge.parent_node.label} ({edge.parent_node.id}) + {edge.child_node.label} ({edge.child_node.id}) - {edge.weight}')
 
                     # on recherche le delta minimum
@@ -299,7 +312,7 @@ class Hungarian:
                         delta = edge_delta
 
         if self.debug:
-            print(f'Delta={delta}')
+            self.log(f'Delta={delta}')
 
         # Une fois delta trouve on veut update les valeur de chaque noeud
         if delta is not None:
@@ -316,10 +329,10 @@ class Hungarian:
                 node.label += delta
 
         if self.debug:
-            self.graph.get_equality_graph().draw(
-                bipartite=False, title='Updated labels - Equality graph')
+            # self.graph.get_equality_graph().draw(
+            #    bipartite=False, title='Updated labels - Equality graph')
 
-            self.graph.draw(bipartite=False,
-                            title='Updated labels - Full graph')
+            # self.graph.draw(bipartite=False,
+            #                title='Updated labels - Full graph')
 
-        return delta
+            return delta
